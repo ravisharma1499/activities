@@ -151,7 +151,13 @@
 			<hr class="m-2 mt-0" />
 			<div id="items-list">
 				<div class="row m-2" id="row-0">
-					<div class="col-5 p-1">
+					<div class="col-5 p-1 position-relative">
+						<button
+							type="button"
+							class="btn-close position-absolute top-0 bg-danger rounded-circle start-0 translate-middle opacity-100"
+							onclick="deleteElement(this)"
+							aria-label="Close"
+						></button>
 						<textarea
 							class="form-control rounded-0 rounded-top border border-secondary items-list"
 							id="items-list-0"
@@ -179,7 +185,6 @@
 								<button
 									type="button"
 									class="btn btn-light rounded-0 rounded-bottom border border-secondary"
-									onclick="deleteElement(this)"
 								>
 									<i class="bi bi-calendar"></i>
 								</button>

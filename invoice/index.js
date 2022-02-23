@@ -13,6 +13,7 @@ function updateTotal() {
 	$("#sub-total").text(subTotal.toFixed(2));
 	$("#vat").text((subTotal * 0.2).toFixed(2));
 	$("#total").text((subTotal * 1.2).toFixed(2));
+	$("#total-due-amount").text((subTotal * 1.2).toFixed(2));
 }
 
 // update the total value for each item in the list
@@ -71,7 +72,13 @@ function changeCurrency(element) {
 function appendElement() {
 	$("#items-list").append(
 		`<div class="row m-2" id="row-0">
-			<div class="col-5 p-1">
+			<div class="col-5 p-1 position-relative">
+				<button
+					type="button"
+					class="btn-close position-absolute top-0 bg-danger rounded-circle start-0 translate-middle opacity-100"
+					onclick="deleteElement(this)"
+					aria-label="Close"
+				></button>
 				<textarea
 					class="form-control rounded-0 rounded-top border border-secondary"
 					id="items-list-1"
@@ -186,6 +193,6 @@ function appendElement() {
 
 // delete a row from the invoice list
 function deleteElement(element) {
-	$(element).parent().parent().parent().parent().remove();
+	$(element).parent().parent().remove();
 	updateTotal();
 }
