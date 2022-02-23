@@ -150,10 +150,10 @@
 			</div>
 			<hr class="m-2 mt-0" />
 			<div id="items-list">
-				<div class="row m-2">
+				<div class="row m-2" id="row-0">
 					<div class="col-5 p-1">
 						<textarea
-							class="form-control rounded-0 rounded-top border border-secondary"
+							class="form-control rounded-0 rounded-top border border-secondary items-list"
 							id="items-list-0"
 							rows="3"
 							style="resize: none"
@@ -170,7 +170,7 @@
 							>
 								<button
 									type="button"
-									class="btn btn-light rounded-0 rounded-bottom border border-secondary"
+									class="btn btn-light rounded-0 rounded-bottom border border-secondary items-list"
 									id="items-list-copy-0"
 									onclick="copyToClipboard(this)"
 								>
@@ -179,6 +179,7 @@
 								<button
 									type="button"
 									class="btn btn-light rounded-0 rounded-bottom border border-secondary"
+									onclick="deleteElement(this)"
 								>
 									<i class="bi bi-calendar"></i>
 								</button>
@@ -225,17 +226,15 @@
 					<div class="col-2 p-1">
 						<input
 							type="text"
-							class="form-control"
-							onchange="calculateTotal(this)"
-							id="quantity-list-0"
+							class="form-control item-quantity"
+							onchange="calculateElementTotal(this)"
 						/>
 					</div>
 					<div class="col-2 p-1">
 						<input
 							type="text"
-							class="form-control"
-							onchange="calculateTotal(this)"
-							id="rate-list-0"
+							class="form-control item-rate"
+							onchange="calculateElementTotal(this)"
 						/>
 						<select
 							class="form-select form-select-sm w-75 mt-1 ms-auto"
@@ -247,13 +246,13 @@
 					<div class="col-3 p-1">
 						<div class="input-group mb-auto">
 							<span
-								class="input-group-text bg-white border-end-0"
+								class="input-group-text bg-white border-end-0 item-total-currency"
 								id="item-total-currency-list-0"
 								>GBP</span
 							>
 							<input
 								type="text"
-								class="form-control border-start-0"
+								class="form-control border-start-0 item-total"
 								id="item-total-list-0"
 								aria-describedby="basic-addon3"
 							/>
@@ -266,7 +265,7 @@
 				<div class="col">
 					<button
 						type="button"
-						onclick="addNewElement()"
+						onclick="appendElement()"
 						class="btn btn-primary"
 					>
 						New Line
@@ -336,4 +335,5 @@
 	crossorigin="anonymous"
 ></script>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="./index.js"></script>
