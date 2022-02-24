@@ -10,7 +10,7 @@ function updateTotal() {
 	$(".item-total").each(function () {
 		subTotal += parseFloat($(this).val());
 	});
-	$("#sub-total").text(subTotal.toFixed(2));
+	$("#sub-total").text(parseInt(subTotal.toFixed(2)));
 	$("#vat").text((subTotal * 0.2).toFixed(2));
 	$("#total").text((subTotal * 1.2).toFixed(2));
 	$("#total-due-amount").text((subTotal * 1.2).toFixed(2));
