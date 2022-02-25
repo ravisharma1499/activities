@@ -6,10 +6,11 @@ currency_rates.set("EUR", 1.2);
 
 // initiate indexedDB
 let db; // global variable
+let request; // global variable
 if (!window.indexedDB) {
 	console.log("Database not supported");
 }
-let request = window.indexedDB.open("invoice_db", 1);
+request = window.indexedDB.open("invoice_db", 1);
 request.onerror = function (event) {
 	alert("Error opening database");
 };
@@ -39,12 +40,11 @@ request.onupgradeneeded = function (event) {
 	};
 };
 
-function addInvoiceDB(
-	invoice_number,
-	invoice_date,
-	invoice_due_date,
-	purchase_order_number
-) {
+function addInvoice() {
+	let invoice_number = $("#invoice-no").val();
+	let invoice_date = $("#invoice-date").val();
+	let invoice_due_date = $("#invoice-due").val();
+	let purchase_order_number = $("#purchase-order-number").val();
 	let transaction = db.transaction(["invoice"], "readwrite");
 	transaction.oncomplete = function (event) {
 		console.log("Transaction completed");
@@ -52,14 +52,12 @@ function addInvoiceDB(
 	transaction.onerror = function (event) {
 		console.log("Transaction not completed");
 	};
-	let new_invoice = [
-		{
-			invoice_number: invoice_number,
-			invoice_date: invoice_date,
-			invoice_due_date: invoice_due_date,
-			purchase_order_number: purchase_order_number,
-		},
-	];
+	let new_invoice = {
+		invoice_number: invoice_number,
+		invoice_date: invoice_date,
+		invoice_due_date: invoice_due_date,
+		purchase_order_number: purchase_order_number,
+	};
 	let objectStore = transaction.objectStore("invoice");
 	let request = objectStore.add(new_invoice);
 	request.onsuccess = function (event) {
@@ -67,31 +65,8 @@ function addInvoiceDB(
 	};
 }
 
-function readInvoice(invoice_number) {
-	let invoice = {};
-	let transaction = db.transaction(["invoice"], "readonly");
-	transaction.oncomplete = function (event) {
-		console.log("Transaction completed");
-	};
-	transaction.onerror = function (event) {
-		console.log("Transaction not completed");
-	};
-	let objectStore = transaction.objectStore("invoice");
-	let request = objectStore.get(invoice_number);
-	request.onsuccess = function (event) {
-		console.log(request.result);
-		invoice = request.result;
-		console.log(invoice);
-	};
-	return invoice;
-}
-
-function updateInvoice(
-	invoice_number,
-	invoice_date,
-	invoice_due_date,
-	purchase_order_number
-) {
+function readInvoice() {
+	let invoice_number = $("#invoice-no").val();
 	let transaction = db.transaction(["invoice"], "readwrite");
 	transaction.oncomplete = function (event) {
 		console.log("Transaction completed");
@@ -102,41 +77,47 @@ function updateInvoice(
 	let objectStore = transaction.objectStore("invoice");
 	let request = objectStore.get(invoice_number);
 	request.onsuccess = function (event) {
-		let invoice = request.result;
-		invoice.invoice_date = invoice_date;
-		invoice.invoice_due_date = invoice_due_date;
-		invoice.purchase_order_number = purchase_order_number;
-		let request = objectStore.put(invoice);
-		request.onsuccess = function (event) {
-			console.log("Invoice updated");
-		};
+		if (request.result) {
+			console.log("Invoice found");
+			updateInvoice();
+		} else {
+			console.log("Invoice not found");
+			addInvoice();
+		}
+	};
+	request.onerror = function (event) {
+		console.log("Error");
 	};
 }
 
-function createOrUpdateInvoice() {
+function updateInvoice() {
 	let invoice_number = $("#invoice-no").val();
 	let invoice_date = $("#invoice-date").val();
 	let invoice_due_date = $("#invoice-due").val();
 	let purchase_order_number = $("#purchase-order-number").val();
-	if (readInvoice(invoice_number) != undefined) {
-		updateInvoice(
-			invoice_number,
-			invoice_date,
-			invoice_due_date,
-			purchase_order_number
-		);
-	} else {
-		addInvoiceDB(
-			invoice_number,
-			invoice_date,
-			invoice_due_date,
-			purchase_order_number
-		);
-	}
+	let transaction = db.transaction(["invoice"], "readwrite");
+	transaction.oncomplete = function (event) {
+		console.log("Transaction completed");
+	};
+	transaction.onerror = function (event) {
+		console.log("Transaction not completed");
+	};
+	let objectStore = transaction.objectStore("invoice");
+	let new_invoice = {
+		invoice_number: invoice_number,
+		invoice_date: invoice_date,
+		invoice_due_date: invoice_due_date,
+		purchase_order_number: purchase_order_number,
+	};
+	let request = objectStore.put(new_invoice);
+	request.onsuccess = function (event) {
+		console.log("Invoice updated finally");
+	};
 }
 
 // load values from browser storage on page load
 $(document).ready(function () {
+	console.log("is this first?");
 	$("#currency").val(sessionStorage.getItem("currency"));
 	changeCurrency($("#currency"));
 	$("#invoice-no").val(localStorage.getItem("invoice_number"));
@@ -353,23 +334,4 @@ function appendElement() {
 function deleteElement(element) {
 	$(element).parent().parent().remove();
 	updateTotal();
-}
-
-// using indexedDB to save the invoice details
-function saveInvoice() {
-	// get the invoice details
-	let invoice_number = $("#invoice-no").val();
-	let invoice_date = $("#invoice-date").val();
-	let invoice_due_date = $("#invoice-due").val();
-	let purchase_order_number = $("#purchase-order-number").val();
-
-	if (
-		invoice_number == "" ||
-		invoice_date == "" ||
-		invoice_due_date == "" ||
-		purchase_order_number == ""
-	) {
-		return;
-	} else {
-	}
 }
