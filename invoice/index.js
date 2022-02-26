@@ -7,38 +7,83 @@ currency_rates.set("EUR", 1.2);
 // initiate indexedDB
 let db; // global variable
 let request; // global variable
-if (!window.indexedDB) {
-	console.log("Database not supported");
-}
-request = window.indexedDB.open("invoice_db", 1);
-request.onerror = function (event) {
-	alert("Error opening database");
-};
-request.onsuccess = function (event) {
-	db = request.result;
-	console.log("Success:" + db);
-};
-request.onupgradeneeded = function (event) {
-	db = event.target.result;
-	let objectStore = db.createObjectStore("invoice", {
-		keyPath: "invoice_number",
-	});
-	objectStore.createIndex("invoice_number", "invoice_number", {
-		unique: true,
-	});
-	objectStore.createIndex("invoice_date", "invoice_date", {
-		unique: false,
-	});
-	objectStore.createIndex("invoice_due_date", "invoice_due_date", {
-		unique: false,
-	});
-	objectStore.createIndex("purchase_order_number", "purchase_order_number", {
-		unique: false,
-	});
-	objectStore.transaction.oncomplete = function (event) {
-		console.log("Database created");
+
+// load values from browser storage on page load
+$(document).ready(function () {
+	console.log("is this first?");
+	$("#currency").val(sessionStorage.getItem("currency"));
+	changeCurrency($("#currency"));
+	$("#invoice-no").val(localStorage.getItem("invoice_number"));
+	if (document.cookie.length > 0) {
+		let cookies = document.cookie.split(";");
+		for (let i = 0; i < cookies.length; i++) {
+			let cookie = cookies[i].split("=");
+			if (cookie[0].trim() == "language") {
+				$("#language").val(cookie[1]);
+			}
+		}
+	}
+	if (!window.indexedDB) {
+		console.log("Database not supported");
+	}
+	request = window.indexedDB.open("invoice_db", 1);
+	request.onerror = function (event) {
+		alert("Error opening database");
 	};
-};
+	request.onsuccess = function (event) {
+		db = request.result;
+		console.log("Success:" + db);
+		readInvoiceAndUpdateFields();
+	};
+	request.onupgradeneeded = function (event) {
+		db = event.target.result;
+		let objectStore = db.createObjectStore("invoice", {
+			keyPath: "invoice_number",
+		});
+		objectStore.createIndex("invoice_number", "invoice_number", {
+			unique: true,
+		});
+		objectStore.createIndex("invoice_date", "invoice_date", {
+			unique: false,
+		});
+		objectStore.createIndex("invoice_due_date", "invoice_due_date", {
+			unique: false,
+		});
+		objectStore.createIndex("purchase_order_number", "purchase_order_number", {
+			unique: false,
+		});
+		objectStore.transaction.oncomplete = function (event) {
+			console.log("Database created");
+		};
+	};
+});
+
+function readInvoiceAndUpdateFields() {
+	let invoice_number = $("#invoice-no").val();
+	let transaction = db.transaction(["invoice"], "readwrite");
+	transaction.oncomplete = function (event) {
+		console.log("Transaction completed");
+	};
+	transaction.onerror = function (event) {
+		console.log("Transaction not completed");
+	};
+	let objectStore = transaction.objectStore("invoice");
+	let request = objectStore.get(invoice_number);
+	request.onsuccess = function (event) {
+		if (request.result) {
+			console.log("Invoice found");
+			$("#invoice-date").val(request.result.invoice_date);
+			$("#invoice-due").val(request.result.invoice_due_date);
+			$("#purchase-order-number").val(request.result.purchase_order_number);
+		} else {
+			console.log("Invoice not found");
+			addInvoice();
+		}
+	};
+	request.onerror = function (event) {
+		console.log("Error");
+	};
+}
 
 function addInvoice() {
 	let invoice_number = $("#invoice-no").val();
@@ -65,7 +110,7 @@ function addInvoice() {
 	};
 }
 
-function readInvoice() {
+function createOrUpdateInvoice() {
 	let invoice_number = $("#invoice-no").val();
 	let transaction = db.transaction(["invoice"], "readwrite");
 	transaction.oncomplete = function (event) {
@@ -114,23 +159,6 @@ function updateInvoice() {
 		console.log("Invoice updated finally");
 	};
 }
-
-// load values from browser storage on page load
-$(document).ready(function () {
-	console.log("is this first?");
-	$("#currency").val(sessionStorage.getItem("currency"));
-	changeCurrency($("#currency"));
-	$("#invoice-no").val(localStorage.getItem("invoice_number"));
-	if (document.cookie.length > 0) {
-		let cookies = document.cookie.split(";");
-		for (let i = 0; i < cookies.length; i++) {
-			let cookie = cookies[i].split("=");
-			if (cookie[0].trim() == "language") {
-				$("#language").val(cookie[1]);
-			}
-		}
-	}
-});
 
 // store invoice number in local storage
 function storeInvoiceNumber(element) {
