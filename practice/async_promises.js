@@ -78,6 +78,10 @@ login("john", "123")
 		console.log(error);
 	});
 
+// * The arguments to then are optional
+// * and catch(failureCallback)
+// * is short for then(null, failureCallback).
+
 // ? asynchronous async?
 Promise.all([
 	login("john", "123"),
