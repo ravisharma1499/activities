@@ -10,6 +10,8 @@ export class ChildComponent implements OnInit {
   @Input() childMessage: string;
   @Output() messageEvent = new EventEmitter<string>();
 
+  message="Hello ViewInit!"
+
   constructor() { }
 
   ngOnInit(): void {

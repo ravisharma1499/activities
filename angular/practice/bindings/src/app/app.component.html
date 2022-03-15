@@ -1,0 +1,42 @@
+<!-- Styled heading -->
+<h1
+  [style.width]="'150px'"
+  [style]="{
+    height: '80px',
+    backgroundColor: 'red'
+  }"
+>
+  The Heading
+</h1>
+
+<!-- Binding using properties -->
+<img [src]="itemImageUrl" [class.small-border]="hasSmallBorder" />
+
+<!-- Using attributes -->
+<img src="../assets/images/sunrise.jpeg" />
+<img src="{{ itemImageUrl }}" />
+
+<!-- using attribute binding -->
+<img [attr.src]="itemImageUrl" [class.thick-border]="hasThickBorder" />
+
+<!-- String list of classes -->
+<img
+  [attr.src]="itemImageUrl"
+  [class]="'hasSmallBorder red-border dotted-border'"
+/>
+
+<!-- Object of class names and boolean -->
+<img
+  [attr.src]="itemImageUrl"
+  [class]="{
+    'small-border': hasSmallBorder,
+    'red-border': true,
+    'dotted-border': hasDottedBorder
+  }"
+/>
+
+<!-- Array of class names -->
+<img
+  [attr.src]="itemImageUrl"
+  [class]="['thick-border', 'red-border', 'dotted-border']"
+/>
